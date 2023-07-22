@@ -12,8 +12,10 @@ from theatre.models import (
     Reservation
 )
 from theatre.serializers import (
-    GenreSerializer, ActorSerializer, TheatreHallSerializer,
-
+    GenreSerializer,
+    ActorSerializer,
+    TheatreHallSerializer,
+    PlaySerializer,
 )
 
 
@@ -42,3 +44,13 @@ class TheatreHallViewSet(
 ):
     queryset = TheatreHall.objects.all()
     serializer_class = TheatreHallSerializer
+
+
+class PlayViewSet(
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    GenericViewSet,
+):
+    queryset = Play.objects.prefetch_related("genres", "actors")
+    serializer_class = PlaySerializer
