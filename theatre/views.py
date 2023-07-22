@@ -15,7 +15,7 @@ from theatre.serializers import (
     GenreSerializer,
     ActorSerializer,
     TheatreHallSerializer,
-    PlaySerializer, PerformanceSerializer,
+    PlaySerializer, PerformanceSerializer, ReservationSerializer,
 )
 
 
@@ -61,6 +61,15 @@ class PerformanceViewSet(viewsets.ModelViewSet):
     serializer_class = PerformanceSerializer
 
 
-class
+class ReservationViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    GenericViewSet
+):
+    queryset = Reservation.objects.prefetch_related(
+        "tickets__performance__play",
+        "tickets__performance__theatre_hall"
+    )
+    serializer_class = ReservationSerializer
 
 
