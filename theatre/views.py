@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.db.models import F, Count
 from rest_framework import mixins, viewsets, status
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -21,8 +22,13 @@ from theatre.serializers import (
     TheatreHallSerializer,
     PlaySerializer,
     PerformanceSerializer,
-    ReservationSerializer, PlayListSerializer, PlayDetailSerializer, ReservationListSerializer,
-    PerformanceListSerializer, PerformanceDetailSerializer, PlayImageSerializer,
+    ReservationSerializer,
+    PlayListSerializer,
+    PlayDetailSerializer,
+    ReservationListSerializer,
+    PerformanceListSerializer,
+    PerformanceDetailSerializer,
+    PlayImageSerializer,
 )
 
 
@@ -33,6 +39,7 @@ class GenreViewSet(
 ):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    authentication_classes = (TokenAuthentication,)
 
 
 class ActorViewSet(
@@ -42,6 +49,7 @@ class ActorViewSet(
 ):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
+    authentication_classes = (TokenAuthentication,)
 
 
 class TheatreHallViewSet(
@@ -51,6 +59,7 @@ class TheatreHallViewSet(
 ):
     queryset = TheatreHall.objects.all()
     serializer_class = TheatreHallSerializer
+    authentication_classes = (TokenAuthentication,)
 
 
 class PlayViewSet(
@@ -61,6 +70,7 @@ class PlayViewSet(
 ):
     queryset = Play.objects.prefetch_related("genres", "actors")
     serializer_class = PlaySerializer
+    authentication_classes = (TokenAuthentication,)
 
     @staticmethod
     def _params_to_ints(qs: str) -> list[int]:
@@ -170,6 +180,7 @@ class ReservationViewSet(
     )
     serializer_class = ReservationSerializer
     pagination_class = ReservationPagination
+    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
