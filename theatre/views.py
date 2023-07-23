@@ -62,11 +62,39 @@ class PlayViewSet(
     queryset = Play.objects.prefetch_related("genres", "actors")
     serializer_class = PlaySerializer
 
+    @staticmethod
+    def _params_to_ints(qs: str) -> list[int]:
+        """Converts a list of string IDs to a list of integers"""
+        return [int(str_id) for str_id in qs.split(",")]
+
+    def get_queryset(self):
+        """Retrieve the plays with filters"""
+        title = self.request.query_params("title")
+        genres = self.request.query_params("genres")
+        actors = self.request.query_params("actors")
+
+        queryset = self.queryset
+
+        if title is not None:
+            queryset = queryset.filter(title__icontains=title)
+
+        if genres is not None:
+            genres_ids = self._params_to_ints(genres)
+            queryset = queryset.filter(genres__id__in=genres_ids)
+
+        if actors is not None:
+            actors_ids = self._params_to_ints(actors)
+            queryset = queryset.filter(actors__id__in=actors_ids)
+
+        return queryset.distinct()
+
     def get_serializer_class(self):
         if self.action == "list":
             return PlayListSerializer
+
         if self.action == "retrieve":
             return PlayDetailSerializer
+
         return PlaySerializer
 
 
@@ -101,8 +129,10 @@ class PerformanceViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return PerformanceListSerializer
+
         if self.action == "retrieve":
             return PerformanceDetailSerializer
+
         return PerformanceSerializer
 
 
@@ -129,6 +159,7 @@ class ReservationViewSet(
     def get_serializer_class(self):
         if self.action == "list":
             return ReservationListSerializer
+
         return ReservationSerializer
 
     def perform_create(self, serializer):
