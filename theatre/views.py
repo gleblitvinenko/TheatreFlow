@@ -69,9 +69,9 @@ class PlayViewSet(
 
     def get_queryset(self):
         """Retrieve the plays with filters"""
-        title = self.request.query_params("title")
-        genres = self.request.query_params("genres")
-        actors = self.request.query_params("actors")
+        title = self.request.query_params.get("title")
+        genres = self.request.query_params.get("genres")
+        actors = self.request.query_params.get("actors")
 
         queryset = self.queryset
 
