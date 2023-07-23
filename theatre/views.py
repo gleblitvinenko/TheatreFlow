@@ -1,13 +1,14 @@
 from datetime import datetime
 
 from django.db.models import F, Count
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from theatre.models import (
     Genre,
@@ -115,7 +116,7 @@ class PlayViewSet(
         methods=["POST"],
         detail=True,
         url_path="upload-image",
-        # permission_classes=[IsAdminUser],
+        permission_classes=[IsAdminUser],
     )
     def upload_image(self, request, pk=None):
         """Endpoint for uploading image to specific play"""
@@ -164,6 +165,24 @@ class PerformanceViewSet(viewsets.ModelViewSet):
             return PerformanceDetailSerializer
 
         return PerformanceSerializer
+
+    @extend_schema(parameters=[
+        OpenApiParameter(
+            "date",
+            type=OpenApiTypes.DATE,
+            description=(
+                    "Filter by datetime of Performance "
+                    "(ex. ?date=2023-07-20)"
+            )
+        ),
+        OpenApiParameter(
+            "play",
+            type=OpenApiTypes.INT,
+            description="Filter by play id (ex. ?play=2)"
+        ),
+    ])
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class ReservationPagination(PageNumberPagination):
