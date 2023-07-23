@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework import mixins, viewsets
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import GenericViewSet
 
 from theatre.models import (
@@ -17,7 +18,7 @@ from theatre.serializers import (
     TheatreHallSerializer,
     PlaySerializer,
     PerformanceSerializer,
-    ReservationSerializer, PlayListSerializer, PlayDetailSerializer,
+    ReservationSerializer, PlayListSerializer, PlayDetailSerializer, ReservationListSerializer,
 )
 
 
@@ -70,6 +71,11 @@ class PerformanceViewSet(viewsets.ModelViewSet):
     serializer_class = PerformanceSerializer
 
 
+class ReservationPagination(PageNumberPagination):
+    page_size = 10
+    max_page_size = 100
+
+
 class ReservationViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
@@ -80,3 +86,15 @@ class ReservationViewSet(
         "tickets__performance__theatre_hall"
     )
     serializer_class = ReservationSerializer
+    pagination_class = ReservationPagination
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return ReservationListSerializer
+        return ReservationSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
