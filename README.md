@@ -106,5 +106,4 @@ To obtain a JWT token, make a POST request to /api/user/token/ with your email a
 
 ---
 
-Thank you for using Theatre-API-Service! If you have any questions or need further assistance, please don't hesitate to reach out. Happy coding!
-The GitHub markdown symbols make the README.md file more visually appealing and easier to read on the GitHub repository page.
+Thank you for using Theatre-API-Service!
